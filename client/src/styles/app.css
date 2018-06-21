@@ -1,0 +1,46 @@
+body, html, #container {
+	width: 100%;
+	height: 90%;
+	margin: 0;
+}
+
+div.main {
+	margin: 10px;
+}
+
+div.rooms {
+	border: 2px solid blue;
+}
+
+div.rooms ul {
+	list-style-type: none;
+}
+
+div.rooms ul li {
+	border: 2px solid blue;
+	border-radius: 5px;
+	background: azure;
+	color: black;
+	margin: 10px; 
+}
+
+div.rooms ul li:hover {
+	cursor: pointer;
+} 
+
+div.messages {
+	border: 2px solid coral;
+	padding: 15px;
+}
+
+div.msgform {
+	border: 2px solid chocolate;
+}
+
+div.msgform textarea {
+	width: 100%;
+}
+
+p.error {
+	color: crimson;
+}

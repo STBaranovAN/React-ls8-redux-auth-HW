@@ -1,0 +1,40 @@
+{
+  "name": "lesson6",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "node node_modules/eslint/bin/eslint ./src",
+    "start": "node node_modules/webpack/bin/webpack -w",
+    "start:dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@material-ui/core": "^1.2.1",
+    "axios": "^0.18.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^4.19.1",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "css-loader": "^0.28.11",
+    "eslint": "^4.19.1",
+    "eslint-plugin-react": "^7.7.0",
+    "immutable": "^3.8.2",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15",
+    "webpack-dev-server": "^3.1.4"
+  }
+}
