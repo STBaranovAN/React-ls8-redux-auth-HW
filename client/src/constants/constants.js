@@ -1,9 +1,11 @@
 export const ALL_ROOMS = 'ALL_ROOMS'
 export const ROOM_MSGS = 'ROOM_MSGS'
 export const POST_MSG = 'POST_MSG'
+export const AUTH_USER = 'AUTH_USER'
 
 export const API_URL = 'http://localhost:6060/api'
 export const API_URL_POST = 'http://localhost:6060/api/addmessage'
+export const API_URL_AUTH = 'http://localhost:6060/api/auth'
 export const USER_ID = 12345
 
 export const rooms_title = "All rooms:"

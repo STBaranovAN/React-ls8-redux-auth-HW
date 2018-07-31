@@ -50931,6 +50931,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.getRooms = getRooms;
 exports.selectRoom = selectRoom;
 exports.addMessage = addMessage;
+exports.login = login;
+exports.tokenCheck = tokenCheck;
+exports.logout = logout;
 
 var _axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 
@@ -51016,6 +51019,83 @@ function addMessage(currentRoom, msgText) {
 	};
 };
 
+function login(userData) {
+
+	console.log("From Action Creator", userData);
+
+	return function (dispatch) {
+		_axios2.default.post(_constants.API_URL_AUTH, JSON.stringify(userData), {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(function (result) {
+			var tokenObj = JSON.stringify(result);
+			localStorage.sagaToken = tokenObj;
+			dispatch({
+				type: _constants.AUTH_USER,
+				payload: {
+					logged: true,
+					token: result.token,
+					err: false,
+					userName: result.name
+				}
+			});
+		}, function (err) {
+			console.log("Reject Error!!!");
+			dispatch({
+				type: _constants.AUTH_USER,
+				payload: {
+					logged: false,
+					token: null,
+					err: "Bad credentials",
+					userName: null
+				}
+			});
+		});
+	};
+}
+
+function tokenCheck() {
+	return function (dispatch) {
+		if (localStorage.sagaToken) {
+			dispatch({
+				type: _constants.AUTH_USER,
+				payload: {
+					logged: true,
+					token: JSON.parse(localStorage.sagaToken).token,
+					err: null,
+					userName: JSON.parse(localStorage.sagaToken).name
+				}
+			});
+		} else {
+			dispatch({
+				type: _constants.AUTH_USER,
+				payload: {
+					logged: false,
+					token: null,
+					err: null,
+					userName: null
+				}
+			});
+		}
+	};
+}
+
+function logout() {
+	return function (dispatch) {
+		delete localStorage.sagaToken;
+		dispatch({
+			type: _constants.AUTH_USER,
+			payload: {
+				logged: false,
+				token: null,
+				err: null,
+				userName: null
+			}
+		});
+	};
+}
+
 /***/ }),
 
 /***/ "./src/app.js":
@@ -51083,9 +51163,11 @@ Object.defineProperty(exports, "__esModule", {
 var ALL_ROOMS = exports.ALL_ROOMS = 'ALL_ROOMS';
 var ROOM_MSGS = exports.ROOM_MSGS = 'ROOM_MSGS';
 var POST_MSG = exports.POST_MSG = 'POST_MSG';
+var AUTH_USER = exports.AUTH_USER = 'AUTH_USER';
 
 var API_URL = exports.API_URL = 'http://localhost:6060/api';
 var API_URL_POST = exports.API_URL_POST = 'http://localhost:6060/api/addmessage';
+var API_URL_AUTH = exports.API_URL_AUTH = 'http://localhost:6060/api/auth';
 var USER_ID = exports.USER_ID = 12345;
 
 var rooms_title = exports.rooms_title = "All rooms:";
@@ -51123,6 +51205,18 @@ var _Grid = __webpack_require__(/*! @material-ui/core/Grid */ "./node_modules/@m
 
 var _Grid2 = _interopRequireDefault(_Grid);
 
+var _TextField = __webpack_require__(/*! @material-ui/core/TextField */ "./node_modules/@material-ui/core/TextField/index.js");
+
+var _TextField2 = _interopRequireDefault(_TextField);
+
+var _Button = __webpack_require__(/*! @material-ui/core/Button */ "./node_modules/@material-ui/core/Button/index.js");
+
+var _Button2 = _interopRequireDefault(_Button);
+
+var _reactRedux = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+
+var _redux = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
+
 var _rooms = __webpack_require__(/*! ./rooms */ "./src/rooms.js");
 
 var _rooms2 = _interopRequireDefault(_rooms);
@@ -51135,7 +51229,11 @@ var _postmsg = __webpack_require__(/*! ./postmsg */ "./src/postmsg.js");
 
 var _postmsg2 = _interopRequireDefault(_postmsg);
 
+var _actions = __webpack_require__(/*! ./actions/actions */ "./src/actions/actions.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -51155,15 +51253,87 @@ var Main = function (_React$Component) {
 	function Main(props) {
 		_classCallCheck(this, Main);
 
-		return _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+
+		_this.state = {
+			view: false,
+			name: "",
+			password: "",
+			tabValue: 0
+		};
+
+		_this.handleLogin = _this.handleLogin.bind(_this);
+		_this.loginLogout = _this.loginLogout.bind(_this);
+		return _this;
 	}
 
 	_createClass(Main, [{
+		key: "componentDidMount",
+		value: function componentDidMount() {
+			this.props.tokenCheck();
+		}
+	}, {
+		key: "componentWillReceiveProps",
+		value: function componentWillReceiveProps(nextProps) {
+			// Will be deprecated from react v17
+			console.log("NextProps", nextProps);
+			if (nextProps.userData.logged) {
+				this.setState({ view: false, tabValue: 0 });
+			}
+		}
+	}, {
+		key: "loginLogout",
+		value: function loginLogout() {
+			if (this.props.userData.logged) {
+				this.props.logout();
+			}
+		}
+	}, {
+		key: "getText",
+		value: function getText(field, e) {
+			var _this2 = this;
+
+			var stateValue = _defineProperty({}, field, e.target.value);
+			//stateValue[field] = e.target.value;
+			this.setState(stateValue, function () {
+				console.log("State from getText", _this2.state);
+			});
+		}
+	}, {
+		key: "handleLogin",
+		value: function handleLogin(e) {
+			e.preventDefault();
+			var userData = {
+				name: this.state.name,
+				password: this.state.password
+			};
+			this.props.userLogin(userData); /// Redux Action Creator
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			return _react2.default.createElement(
 				"div",
 				{ style: mainContainer },
+				_react2.default.createElement(
+					_Grid2.default,
+					{ style: { paddingTop: 15 }, item: true, xs: 12, sm: 4 },
+					_react2.default.createElement(_TextField2.default, { onChange: this.getText.bind(this, "name"), value: this.state.name, fullWidth: true, label: "User Name" }),
+					_react2.default.createElement(_TextField2.default, {
+						onChange: this.getText.bind(this, "password"),
+						type: "password",
+						value: this.state.password,
+						fullWidth: true,
+						label: "User Password",
+						style: { backgroundColor: this.props.userData.err ? "red" : "transparent" }
+					}),
+					_react2.default.createElement(
+						_Button2.default,
+						{ style: { margin: "15px 0" }, color: "primary", variant: "raised", onClick: this.handleLogin },
+						"Login"
+					)
+				),
+				_react2.default.createElement("br", null),
 				_react2.default.createElement(
 					_Grid2.default,
 					{ container: true, spacing: 24 },
@@ -51187,7 +51357,19 @@ var Main = function (_React$Component) {
 	return Main;
 }(_react2.default.Component);
 
-exports.default = Main;
+function mapStateToProps(state) {
+	return { userData: state.auth };
+}
+
+function mapDispatchToProps(dispatch) {
+	return (0, _redux.bindActionCreators)({
+		userLogin: _actions.login,
+		tokenCheck: _actions.tokenCheck,
+		logout: _actions.logout
+	}, dispatch);
+}
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Main);
 
 /***/ }),
 
@@ -51515,6 +51697,36 @@ var _immutable = __webpack_require__(/*! immutable */ "./node_modules/immutable/
 
 /***/ }),
 
+/***/ "./src/reducers/authreducer.js":
+/*!*************************************!*\
+  !*** ./src/reducers/authreducer.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+exports.default = function () {
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { logged: false, token: null, err: null };
+	var action = arguments[1];
+
+	console.log("From reducer", action);
+	switch (action.type) {
+		case _constants.AUTH_USER:
+			return Object.assign({}, state, action.payload);
+	}
+	return state;
+};
+
+var _constants = __webpack_require__(/*! ../constants/constants */ "./src/constants/constants.js");
+
+/***/ }),
+
 /***/ "./src/reducers/msgreducer.js":
 /*!************************************!*\
   !*** ./src/reducers/msgreducer.js ***!
@@ -51766,12 +51978,17 @@ var _postmsgreducer = __webpack_require__(/*! ./reducers/postmsgreducer */ "./sr
 
 var _postmsgreducer2 = _interopRequireDefault(_postmsgreducer);
 
+var _authreducer = __webpack_require__(/*! ./reducers/authreducer */ "./src/reducers/authreducer.js");
+
+var _authreducer2 = _interopRequireDefault(_authreducer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var rootReducer = (0, _redux.combineReducers)({
 	rooms: _allroomsreducer2.default,
 	msgs: _msgreducer2.default,
-	postmsg: _postmsgreducer2.default
+	postmsg: _postmsgreducer2.default,
+	auth: _authreducer2.default
 
 	// rooms: {
 	// 	allRooms: [],

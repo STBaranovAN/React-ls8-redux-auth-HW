@@ -1,7 +1,7 @@
 import axios from "axios";
 import uuid from "uuid";
 import { Map } from "immutable";
-import { ALL_ROOMS, ROOM_MSGS, POST_MSG, API_URL, API_URL_POST, USER_ID, server_error_msg, emty_text_error_msg } from "../constants/constants";
+import { ALL_ROOMS, ROOM_MSGS, POST_MSG, AUTH_USER, API_URL, API_URL_POST, API_URL_AUTH, USER_ID, server_error_msg, emty_text_error_msg } from "../constants/constants";
 
 export function getRooms(){
 
@@ -79,4 +79,85 @@ export function addMessage(currentRoom, msgText){
 			});
 	}
 };
+
+export function login(userData){
+
+	console.log("From Action Creator", userData);
+
+	return function(dispatch) {
+		axios.post(API_URL_AUTH, JSON.stringify(userData), {
+			headers: {
+            	'Content-Type': 'application/json'
+			}
+		})
+			.then( result => {
+				let tokenObj = JSON.stringify(result);
+				localStorage.sagaToken = tokenObj;
+				dispatch({
+					type: AUTH_USER,
+					payload: {
+						logged: true,
+						token: result.token,
+						err: false,
+						userName: result.name
+					},
+				});
+			}, err => {
+				console.log("Reject Error!!!");
+				dispatch({
+					type: AUTH_USER,
+					payload: {
+						logged: false,
+						token: null,
+						err: "Bad credentials",
+						userName: null 
+					},
+				});
+			} )
+	}
+
+}
+
+export function tokenCheck(){
+	return function(dispatch){
+		if(localStorage.sagaToken){
+			dispatch({
+					type: AUTH_USER,
+					payload: {
+						logged: true,
+						token: JSON.parse(localStorage.sagaToken).token,
+						err: null,
+						userName: JSON.parse(localStorage.sagaToken).name,
+					},
+				});
+		}
+		else {
+			dispatch({
+					type: AUTH_USER,
+					payload: {
+						logged: false,
+						token: null,
+						err: null,
+						userName: null,
+					},
+				});
+		}
+
+	}
+}
+
+export function logout(){
+	return function(dispatch) {
+		delete localStorage.sagaToken;
+		dispatch({
+					type: AUTH_USER,
+					payload: {
+						logged: false,
+						token: null,
+						err: null,
+						userName: null,
+					},
+				});
+	}
+}
 
