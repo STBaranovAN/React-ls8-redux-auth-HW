@@ -71,7 +71,7 @@ export function addMessage(currentRoom, msgText){
 			userId: USER_ID,
 			messageId: uuid.v4(),
 			roomId: currentRoom.id 
-			}).then( responseObj => {
+			}).then( (responseObj) => {
 				dispatch(selectRoom(currentRoom));
 			}, err => {
 				console.log(`An error occured: ${err}`);

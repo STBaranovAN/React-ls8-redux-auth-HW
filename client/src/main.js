@@ -8,6 +8,7 @@ import Rooms from "./rooms";
 import Messages from "./messages";
 import PostMsg from "./postmsg";
 import { login, tokenCheck, logout } from "./actions/actions";
+import { BrowserRouter as Router, Route, Link, NavLink, Switch } from "react-router-dom";
 
 const mainContainer = {
 	width: "50%",
@@ -23,7 +24,8 @@ const mainContainer = {
 			view: false,
 			name: "",
 			password: "",
-			tabValue: 0
+			tabValue: 0,
+			logged: false 
 		}
 
 		this.handleLogin = this.handleLogin.bind(this);
@@ -37,7 +39,7 @@ const mainContainer = {
 	componentWillReceiveProps(nextProps){ // Will be deprecated from react v17
 		console.log("NextProps", nextProps);
 		if(nextProps.userData.logged){
-			this.setState({view: false, tabValue: 0});
+			this.setState({view: false, tabValue: 0, logged: true});
 		}
 	}
 
@@ -65,32 +67,52 @@ const mainContainer = {
 	}
 	
 	render() {
+
+		if(this.state.logged)
+		{
+			// this.context.router.history.push('/about');
+			console.log("!!!");
+		}
+
 		return (
-			<div style={ mainContainer }>
-				<Grid style={{paddingTop: 15}} item xs={12} sm={4}>
-					<TextField onChange={this.getText.bind(this, "name")} value={this.state.name} fullWidth label="User Name" />
-					<TextField 
-						onChange={this.getText.bind(this, "password")} 
-						type="password" 
-						value={this.state.password} 
-						fullWidth 
-						label="User Password"
-						style={{backgroundColor: this.props.userData.err ? "red" : "transparent"}}
-					/>
-					<Button style={{margin: "15px 0"}} color="primary" variant="raised" onClick={this.handleLogin}>Login</Button>
-				</Grid>
-				<br/>
-				<Grid container spacing={24}>
-					<Grid item xs={12} sm={6}>
-						<Rooms/>
-					</Grid>
-					<Grid item xs={12} sm={6}>
-						<Messages/>
-						<br/>
-						<PostMsg/>
-					</Grid>
-				</Grid>
-			</div>
+			<Router>
+				<div style={ mainContainer }>
+					<Switch>
+						<Route exact path="/(|login)/" render = { () => {
+							return (
+								<Grid style={{paddingTop: 15}} item xs={12} sm={4}>
+								<TextField onChange={this.getText.bind(this, "name")} value={this.state.name} fullWidth label="User Name" />
+								<TextField 
+									onChange={this.getText.bind(this, "password")} 
+									type="password" 
+									value={this.state.password} 
+									fullWidth 
+									label="User Password"
+									style={{backgroundColor: this.props.userData.err ? "red" : "transparent"}}
+								/>
+								<Button style={{margin: "15px 0"}} color="primary" variant="raised" onClick={this.handleLogin}>Login</Button>
+							</Grid>
+							)}}
+						>
+						</Route>
+						<Route exact path="/cabinet" render = { () => {
+							return (
+								<Grid container spacing={24}>
+									<Grid item xs={12} sm={6}>
+										<Rooms/>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<Messages/>
+										<br/>
+										<PostMsg/>
+									</Grid>
+								</Grid>
+							)}}
+						>
+						</Route>
+					</Switch>
+				</div>
+			</Router>
 		)
 	}
 }

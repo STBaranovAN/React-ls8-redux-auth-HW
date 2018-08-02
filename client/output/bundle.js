@@ -51231,6 +51231,8 @@ var _postmsg2 = _interopRequireDefault(_postmsg);
 
 var _actions = __webpack_require__(/*! ./actions/actions */ "./src/actions/actions.js");
 
+var _reactRouterDom = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"react-router-dom\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -51312,42 +51314,57 @@ var Main = function (_React$Component) {
 	}, {
 		key: "render",
 		value: function render() {
+			var _this3 = this;
+
 			return _react2.default.createElement(
-				"div",
-				{ style: mainContainer },
+				_reactRouterDom.BrowserRouter,
+				null,
 				_react2.default.createElement(
-					_Grid2.default,
-					{ style: { paddingTop: 15 }, item: true, xs: 12, sm: 4 },
-					_react2.default.createElement(_TextField2.default, { onChange: this.getText.bind(this, "name"), value: this.state.name, fullWidth: true, label: "User Name" }),
-					_react2.default.createElement(_TextField2.default, {
-						onChange: this.getText.bind(this, "password"),
-						type: "password",
-						value: this.state.password,
-						fullWidth: true,
-						label: "User Password",
-						style: { backgroundColor: this.props.userData.err ? "red" : "transparent" }
-					}),
+					"div",
+					{ style: mainContainer },
 					_react2.default.createElement(
-						_Button2.default,
-						{ style: { margin: "15px 0" }, color: "primary", variant: "raised", onClick: this.handleLogin },
-						"Login"
-					)
-				),
-				_react2.default.createElement("br", null),
-				_react2.default.createElement(
-					_Grid2.default,
-					{ container: true, spacing: 24 },
-					_react2.default.createElement(
-						_Grid2.default,
-						{ item: true, xs: 12, sm: 6 },
-						_react2.default.createElement(_rooms2.default, null)
-					),
-					_react2.default.createElement(
-						_Grid2.default,
-						{ item: true, xs: 12, sm: 6 },
-						_react2.default.createElement(_messages2.default, null),
-						_react2.default.createElement("br", null),
-						_react2.default.createElement(_postmsg2.default, null)
+						_reactRouterDom.Switch,
+						null,
+						_react2.default.createElement(_reactRouterDom.Route, { exact: true, path: "/", render: function render() {
+								return _react2.default.createElement(
+									_Grid2.default,
+									{ style: { paddingTop: 15 }, item: true, xs: 12, sm: 4 },
+									_react2.default.createElement(_TextField2.default, { onChange: _this3.getText.bind(_this3, "name"), value: _this3.state.name, fullWidth: true, label: "User Name" }),
+									_react2.default.createElement(_TextField2.default, {
+										onChange: _this3.getText.bind(_this3, "password"),
+										type: "password",
+										value: _this3.state.password,
+										fullWidth: true,
+										label: "User Password",
+										style: { backgroundColor: _this3.props.userData.err ? "red" : "transparent" }
+									}),
+									_react2.default.createElement(
+										_Button2.default,
+										{ style: { margin: "15px 0" }, color: "primary", variant: "raised", onClick: _this3.handleLogin },
+										"Login"
+									)
+								);
+							}
+						}),
+						_react2.default.createElement(_reactRouterDom.Route, { exact: true, path: "/cabinet", render: function render() {
+								return _react2.default.createElement(
+									_Grid2.default,
+									{ container: true, spacing: 24 },
+									_react2.default.createElement(
+										_Grid2.default,
+										{ item: true, xs: 12, sm: 6 },
+										_react2.default.createElement(_rooms2.default, null)
+									),
+									_react2.default.createElement(
+										_Grid2.default,
+										{ item: true, xs: 12, sm: 6 },
+										_react2.default.createElement(_messages2.default, null),
+										_react2.default.createElement("br", null),
+										_react2.default.createElement(_postmsg2.default, null)
+									)
+								);
+							}
+						})
 					)
 				)
 			);
